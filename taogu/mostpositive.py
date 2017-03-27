@@ -5,6 +5,7 @@ import random
 import time
 import json
 import re
+import MySQLdb
 # import sys
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -13,11 +14,8 @@ import re
 def onetime():
     timenow = int(time.time())
     parm = str(timenow) + str(random.randint(100,999))
-    # print parm
     url = 'https://www.taoguba.com.cn/getNrntActualMatch?_='+ parm
-    # url = 'https://www.taoguba.com.cn/getNrntActualMatch?_=1490583133892'
-    print url
-
+    
     # headers = [
     # {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0'},
     # {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'},
@@ -28,7 +26,8 @@ def onetime():
     # {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'}
     # ]
     headers = {
-               'Cookie':'JSESSIONID=f1c29c72-8243-4c7d-bc23-dd6c97baa507; UM_distinctid=15b0d95ad6733e-00b37316d7bbfb-1c3b6b51-1fa400-15b0d95ad68930; CNZZDATA1574657=cnzz_eid%3D1105896313-1490579697-%26ntime%3D1490579697'
+               # 'Cookie':'JSESSIONID=f1c29c72-8243-4c7d-bc23-dd6c97baa507; UM_distinctid=15b0d95ad6733e-00b37316d7bbfb-1c3b6b51-1fa400-15b0d95ad68930; CNZZDATA1574657=cnzz_eid%3D1105896313-1490579697-%26ntime%3D1490579697',
+               'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
                }
     source_code = requests.get(url,headers)
     data = json.loads(source_code.text)
@@ -42,7 +41,24 @@ def onetime():
                 result[onedata] += 1
             else:
                 result[onedata] = 1
-    print sorted(result.items(), key = lambda x:x[1],reverse=True)
+    formatdata = sorted(result.items(), key = lambda x:x[1],reverse=True)
+    print type(formatdata)
+    return formatdata
+
+
+def InsertData(dict):
+    try:
+        conn=MySQLdb.connect(host='localhost',user='root',passwd='ceshi123',db='stock',port=3306)
+        cur=conn.cursor()
+        for (key,values) in dict:
+            cur.execute('insert into hotstock (code,times) values (%s,%s)',(key,values))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+
+
 
 
 # format_data('["sz002302","sh600425","sz000877"]_[268335,268333,268334]')
@@ -66,4 +82,5 @@ def onetime():
     # f.write(file_content)
     # f.close()
 
-onetime()
+# onetime()
+InsertData(onetime())
