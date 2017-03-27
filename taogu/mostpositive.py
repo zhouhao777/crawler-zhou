@@ -34,17 +34,16 @@ def onetime():
     data = json.loads(source_code.text)
     print data['_t']
     print data['status']
-    result = []
+    result = {}
     for item in data['dto']['listTopic']:
         res = re.findall(r"\"(.+?)\"",item['recomStock'])
-        result.append(res)
-    print result
+        for onedata in res:
+            if result.has_key(onedata):
+                result[onedata] += 1
+            else:
+                result[onedata] = 1
+    print sorted(result.items(), key = lambda x:x[1],reverse=True)
 
-
-def format_data(data):
-    #["sz002683"]_[268336]
-    #["sz002302","sh600425","sz000877"]_[268335,268333,268334]
-    print re.findall(r"\"(.+?)\"",data)#
 
 # format_data('["sz002302","sh600425","sz000877"]_[268335,268333,268334]')
 
