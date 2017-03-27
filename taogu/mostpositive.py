@@ -59,28 +59,14 @@ def InsertData(dict):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 
-
-
-# format_data('["sz002302","sh600425","sz000877"]_[268335,268333,268334]')
-
-
-
-
-    # print plain_text
-    # file_content = ''
-    # result = 'onetime.txt'
-    # soup = BeautifulSoup(plain_text,'html.parser')
-    # lines = soup.find_all('li',{'class':'mu103'})
-    # print lines
-    # for line in lines:
-    #     for label in line.find_all('label'):
-    #         name = label.string
-    #         print name
-    #         if code not in file_content:
-    #             file_content += "%s\t%s\n"%(code,name)
-    # f = open(result,'w')
-    # f.write(file_content)
-    # f.close()
-
 # onetime()
 InsertData(onetime())
+
+
+
+def sleeptime(hour,min,sec):
+    return hour*3600 + min*60 + sec;
+second = sleeptime(0,0,20)
+while 1==1:
+    time.sleep(second)
+    InsertData(onetime())
