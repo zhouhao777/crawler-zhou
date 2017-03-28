@@ -37,17 +37,13 @@ def onetime():
     for item in data['dto']['listTopic']:
         res = re.findall(r"\"(.+?)\"",item['recomStock'])
         topicID = item['topicID']
-        # topicID = 1657270
-        print type(topicID)
-        # TODO  if topicID not in topicIDs:
         topicIDs = queryData()
-        print topicIDs[1]
-        print (topicID  in topicIDs)
-        exit()
-        if topicID not in topicIDs:
+        list_topicIDs=[]
+        for one in topicIDs:
+            list_topicIDs.append(one[0])
+        if topicID not in list_topicIDs:
             for onedata in res:
                 result.append((topicID,str(onedata)))
-    print result
     for item in result:
         print 'insert into hotstock (code,times) values (%s,%s)'% item
     return result
