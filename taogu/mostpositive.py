@@ -31,42 +31,63 @@ def onetime():
                }
     source_code = requests.get(url,headers)
     data = json.loads(source_code.text)
-    print data['_t']
-    print data['status']
-    result = {}
+    # print data['_t']
+    # print data['status']
+    result = []
     for item in data['dto']['listTopic']:
         res = re.findall(r"\"(.+?)\"",item['recomStock'])
-        for onedata in res:
-            if result.has_key(onedata):
-                result[onedata] += 1
-            else:
-                result[onedata] = 1
-    formatdata = sorted(result.items(), key = lambda x:x[1],reverse=True)
-    print type(formatdata)
-    return formatdata
+        topicID = item['topicID']
+        # topicID = 1657270
+        print type(topicID)
+        # TODO  if topicID not in topicIDs:
+        topicIDs = queryData()
+        print topicIDs[1]
+        print (topicID  in topicIDs)
+        exit()
+        if topicID not in topicIDs:
+            for onedata in res:
+                result.append((topicID,str(onedata)))
+    print result
+    for item in result:
+        print 'insert into hotstock (code,times) values (%s,%s)'% item
+    return result
 
 
-def InsertData(dict):
+def insertData(list):
     try:
-        conn=MySQLdb.connect(host='localhost',user='root',passwd='ceshi123',db='stock',port=3306)
-        cur=conn.cursor()
-        for (key,values) in dict:
-            cur.execute('insert into hotstock (code,times) values (%s,%s)',(key,values))
+        conn = MySQLdb.connect(host='localhost',user='root',passwd='ceshi123',db='crawler',port=3306)
+        cur = conn.cursor()
+        for item in list:
+            cur.execute('insert into hotstock (topicID,code) values (%s,%s)',item)
         conn.commit()
         cur.close()
         conn.close()
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
+def queryData():
+     try:
+        conn = MySQLdb.connect(host='localhost',user='root',passwd='ceshi123',db='crawler',port=3306)
+        cur = conn.cursor()
+        cur.execute("select topicID from hotstock")
+        lines = cur.fetchall()
+        conn.commit()
+        cur.close()
+        conn.close()
+     except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+     return lines
 
-# onetime()
-InsertData(onetime())
 
 
 
-def sleeptime(hour,min,sec):
-    return hour*3600 + min*60 + sec;
-second = sleeptime(0,0,20)
-while 1==1:
-    time.sleep(second)
-    InsertData(onetime())
+
+insertData(onetime())
+#queryData()
+
+# def sleeptime(hour,min,sec):
+#     return hour*3600 + min*60 + sec;
+# second = sleeptime(0,0,20)
+# while 1==1:
+#     time.sleep(second)
+#     InsertData(onetime())
